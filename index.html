@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Redirect to Obsidian</title>
+<style>body{font-family:system-ui,sans-serif;margin:3rem 1rem;text-align:center;color:#222;background:#fff}a{color:#7c3aed}</style>
+</head>
+<body>
+<p id="msg">Opening Obsidian…</p>
+<p><a id="link" href="#" hidden>Open in Obsidian</a></p>
+<script>
+  // Usage: /#vault=<vault>&file=<path>  (the part after # never reaches the server)
+  var p = new URLSearchParams(location.hash.slice(1));
+  var vault = p.get("vault"), file = p.get("file");
+  if (vault && file) {
+    var url = "obsidian://open?vault=" + encodeURIComponent(vault) + "&file=" + encodeURIComponent(file);
+    var a = document.getElementById("link");
+    a.href = url; a.hidden = false;
+    location.replace(url);
+  } else {
+    document.getElementById("msg").textContent = "Nothing to open.";
+  }
+</script>
+</body>
+</html>
