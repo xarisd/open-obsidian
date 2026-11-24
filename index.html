@@ -20,6 +20,13 @@
     var a = document.getElementById("link");
     a.href = url; a.hidden = false;
     location.replace(url);
+    // Close this tab once Obsidian takes focus (only works for tabs opened from a link)
+    var closeTab = function () {
+      window.close();
+      document.getElementById("msg").textContent = "Opened in Obsidian. You can close this tab.";
+    };
+    window.addEventListener("blur", closeTab, { once: true });
+    document.addEventListener("visibilitychange", function () { if (document.hidden) closeTab(); }, { once: true });
   } else {
     document.getElementById("msg").textContent = "Nothing to open.";
   }
