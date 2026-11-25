@@ -20,13 +20,20 @@
     var a = document.getElementById("link");
     a.href = url; a.hidden = false;
     location.replace(url);
-    // Close this tab once Obsidian takes focus (only works for tabs opened from a link)
-    var closeTab = function () {
-      window.close();
-      document.getElementById("msg").textContent = "Opened in Obsidian. You can close this tab.";
+    // Close this tab 5 seconds after it loses focus (only works for tabs opened from a link).
+    // The delay leaves time for the browser's "Open Obsidian?" prompt: closing at once
+    // dismissed the prompt along with the tab, so Obsidian never received the link.
+    var timer = null;
+    var closeSoon = function () {
+      if (timer) return;
+      document.getElementById("msg").textContent = "Opening Obsidian… this tab closes in 5 seconds.";
+      timer = setTimeout(function () {
+        window.close();
+        document.getElementById("msg").textContent = "Opened in Obsidian. You can close this tab.";
+      }, 5000);
     };
-    window.addEventListener("blur", closeTab, { once: true });
-    document.addEventListener("visibilitychange", function () { if (document.hidden) closeTab(); }, { once: true });
+    window.addEventListener("blur", closeSoon);
+    document.addEventListener("visibilitychange", function () { if (document.hidden) closeSoon(); });
   } else {
     document.getElementById("msg").textContent = "Nothing to open.";
   }
