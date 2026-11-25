@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta name="version" content="1.0.2">
+<meta name="version" content="1.0.3">
 <title>Redirect to Obsidian</title>
 <style>body{font-family:system-ui,sans-serif;margin:3rem 1rem;text-align:center;color:#222;background:#fff}a{color:#7c3aed}</style>
 </head>
 <body>
 <p id="msg">Opening Obsidian…</p>
 <p><a id="link" href="#" hidden>Open in Obsidian</a></p>
-<p style="font-size:12px;color:#888">v1.0.2</p>
+<p style="font-size:12px;color:#888">v1.0.3 - Immediate closing the tab</p>
 <script>
   // Usage: /#vault=<vault>&file=<path>  (the part after # never reaches the server)
   var p = new URLSearchParams(location.hash.slice(1));
@@ -22,20 +22,13 @@
     var a = document.getElementById("link");
     a.href = url; a.hidden = false;
     location.replace(url);
-    // Close this tab 5 seconds after it loses focus (only works for tabs opened from a link).
-    // The delay leaves time for the browser's "Open Obsidian?" prompt: closing at once
-    // dismissed the prompt along with the tab, so Obsidian never received the link.
-    var timer = null;
-    var closeSoon = function () {
-      if (timer) return;
-      document.getElementById("msg").textContent = "Opening Obsidian… this tab closes in 5 seconds.";
-      timer = setTimeout(function () {
-        window.close();
-        document.getElementById("msg").textContent = "Opened in Obsidian. You can close this tab.";
-      }, 5000);
+    // Close this tab as soon as Obsidian takes focus (only works for tabs opened from a link)
+    var closeTab = function () {
+      window.close();
+      document.getElementById("msg").textContent = "Opened in Obsidian. You can close this tab.";
     };
-    window.addEventListener("blur", closeSoon);
-    document.addEventListener("visibilitychange", function () { if (document.hidden) closeSoon(); });
+    window.addEventListener("blur", closeTab, { once: true });
+    document.addEventListener("visibilitychange", function () { if (document.hidden) closeTab(); }, { once: true });
   } else {
     document.getElementById("msg").textContent = "Nothing to open.";
   }
